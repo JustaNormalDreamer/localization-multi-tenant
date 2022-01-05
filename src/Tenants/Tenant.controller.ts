@@ -1,49 +1,47 @@
-import {Body, Delete, Get, JsonController, Param, Post} from "routing-controllers";
-import {InjectRepository} from "typeorm-typedi-extensions";
-import {Tenant} from "./Tenant.entity";
-import {EntityManager, Repository, Transaction, TransactionManager} from "typeorm";
-import {TenantRequest} from "./Tenant.request";
-import {config} from "../config/config";
-import {TenantResponse} from "./TenantResponse";
-import {__trans} from "../Localization/Translate";
+/*
+ * Copyright (c) 2021 Dipesh Shrestha aka JustaDreamer
+ * Github: https://github.com/JustaNormalDreamer
+ */
 
-@JsonController("/tenants")
+import { Body, Delete, Get, JsonController, Param, Post } from 'routing-controllers';
+import { InjectManager, InjectRepository } from 'typeorm-typedi-extensions';
+import { Tenant } from './Tenant.entity';
+import { EntityManager, Repository, Transaction } from 'typeorm';
+import { TenantRequest } from './Tenant.request';
+import { TenantResponse } from './TenantResponse';
+import { Inject } from 'typedi';
+import { TenantService } from './Tenant.service';
+
+@JsonController('/tenants')
 export class TenantController {
+  @Inject()
+  private readonly tenantService: TenantService;
 
-    @InjectRepository(Tenant)
-    private readonly tenantRepository: Repository<Tenant>;
+  @InjectRepository(Tenant)
+  private readonly tenantRepository: Repository<Tenant>;
 
-    @Get()
-    public async index() {
-        return new TenantResponse('FETCH_TENANTS_200', await __trans('FETCH_TENANTS_200'), await this.tenantRepository.find());
-    }
+  @InjectManager()
+  private readonly entityManager: EntityManager;
 
-    @Post()
-    @Transaction()
-    public async store(@TransactionManager() manager: EntityManager, @Body() tenantRequest: TenantRequest) {
-        const tenant = this.tenantRepository.create({
-            ...tenantRequest,
-            // config: {
-            //     dbUser: tenantRequest.code,
-            //     dbPassword: tenantRequest.code,
-            //     dbName: tenantRequest.code,
-            // },
-        });
+  @Get()
+  public async index(): Promise<TenantResponse> {
+    return await this.tenantService.findAllAndRespond();
+  }
 
-        const tenantCreated = await manager.save(tenant);
+  @Get('/:id')
+  public async show(@Param('id') id: string): Promise<TenantResponse> {
+    return await this.tenantService.findAllAndRespond();
+  }
 
-        await manager.query(`CREATE SCHEMA IF NOT EXISTS ${config.tenantPrefix}_${tenantCreated.code}`);
+  @Post()
+  @Transaction()
+  public async store(@Body() tenantRequest: TenantRequest) {
+    return await this.tenantService.create(tenantRequest);
+  }
 
-        return new TenantResponse('CREATE_TENANT_201', await __trans("CREATE_TENANT_201"), tenantCreated);
-    }
-
-    @Delete("/:id")
-    @Transaction()
-    public async destroy(@TransactionManager() manager: EntityManager, @Param("id") id: string) {
-        const tenant: Tenant = await this.tenantRepository.findOneOrFail(id);
-        await manager.remove(tenant);
-        await manager.query(`DROP SCHEMA IF EXISTS ${config.tenantPrefix}_${tenant.code}`);
-        return new TenantResponse('DELETE_TENANT_200', await __trans("DELETE_TENANT_200"));
-    }
-
+  @Delete('/:id')
+  @Transaction()
+  public async destroy(@Param('id') id: string) {
+    return await this.tenantService.deleteAndRespond(id);
+  }
 }

@@ -4,6 +4,6 @@
  */
 
 import { BaseResponse } from '../BaseResponse';
-import { Tenant } from './Tenant.entity';
+import { License } from './License.entity';
 
-export class TenantResponse extends BaseResponse<Tenant>() {}
+export class LicenseResponse extends BaseResponse<License>() {}

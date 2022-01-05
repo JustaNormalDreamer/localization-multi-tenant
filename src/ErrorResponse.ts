@@ -3,4 +3,6 @@
  * Github: https://github.com/JustaNormalDreamer
  */
 
-export class TenantDto {}
+import { BaseResponse } from './BaseResponse';
+
+export class ErrorResponse extends BaseResponse<any>() {}

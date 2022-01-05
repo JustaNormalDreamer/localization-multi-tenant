@@ -1,22 +1,26 @@
-import { Request, Response, NextFunction } from "express";
-import {ExpressMiddlewareInterface, Middleware} from "routing-controllers";
-import {config} from "../config/config";
+/*
+ * Copyright (c) 2021 Dipesh Shrestha aka JustaDreamer
+ * Github: https://github.com/JustaNormalDreamer
+ */
 
-@Middleware({ type: "before" })
+import { Request, Response, NextFunction } from 'express';
+import { ExpressMiddlewareInterface, Middleware } from 'routing-controllers';
+import { config } from '../config/config';
+
+@Middleware({ type: 'before' })
 export class LocaleMiddleware implements ExpressMiddlewareInterface {
-    use(request: Request, response: Response, next: NextFunction) {
+  use(request: Request, response: Response, next: NextFunction) {
+    const supportedLocale: string[] = ['np', 'en'];
 
-        const supportedLocale: string[] = ['np', 'en'];
+    const locale: string = request.headers['x-localization']?.toString();
 
-        const locale: string = request.headers['x-localization']?.toString();
-
-        if(supportedLocale.includes(locale)) {
-            config.locale = locale;
-        } else {
-            config.locale = config.defaultLocale;
-        }
-
-        // do something before controller is executed
-        next();
+    if (supportedLocale.includes(locale)) {
+      config.locale = locale;
+    } else {
+      config.locale = config.defaultLocale;
     }
+
+    // do something before controller is executed
+    next();
+  }
 }

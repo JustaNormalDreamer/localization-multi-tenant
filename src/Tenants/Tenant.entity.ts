@@ -1,86 +1,40 @@
-import {
-    Column,
-    CreateDateColumn,
-    DeleteDateColumn,
-    Entity,
-    PrimaryGeneratedColumn,
-    Unique,
-    UpdateDateColumn
-} from "typeorm";
-import {TenantConfig} from "./TenantConfig";
+/*
+ * Copyright (c) 2021 Dipesh Shrestha aka JustaDreamer
+ * Github: https://github.com/JustaNormalDreamer
+ */
+
+import { Column, Entity, Unique } from 'typeorm';
+import { TenantConfig } from './TenantConfig';
+import { BaseModel } from '../BaseModel';
 
 @Entity({
-    name: "tenants",
-    schema: 'public'
+  name: 'tenants',
+  schema: 'public'
 })
-@Unique(["_code"])
-export class Tenant {
-    @PrimaryGeneratedColumn('uuid')
-    private _id: string;
+@Unique(['_code'])
+export class Tenant extends BaseModel {
+  @Column()
+  private _name: string;
 
-    @Column()
-    private _name: string;
+  @Column()
+  private _code: string;
 
-    @Column()
-    private _code: string;
+  // @Column("jsonb")
+  // private _config: TenantConfig;
 
-    // @Column("jsonb")
-    // private _config: TenantConfig;
+  get name(): string {
+    return this._name;
+  }
 
-    @CreateDateColumn()
-    private _createdAt: Date;
+  set name(value: string) {
+    this._name = value;
+  }
 
-    @UpdateDateColumn()
-    private _updatedAt: Date;
+  get code(): string {
+    return this._code;
+  }
 
-    @DeleteDateColumn()
-    private _deletedAt: Date;
-
-    get id(): string {
-        return this._id;
-    }
-
-    set id(value: string) {
-        this._id = value;
-    }
-
-    get name(): string {
-        return this._name;
-    }
-
-    set name(value: string) {
-        this._name = value;
-    }
-
-    get createdAt(): Date {
-        return this._createdAt;
-    }
-
-    get code(): string {
-        return this._code;
-    }
-
-    set code(value: string) {
-        this._code = value;
-    }
-
-    set createdAt(value: Date) {
-        this._createdAt = value;
-    }
-
-    get updatedAt(): Date {
-        return this._updatedAt;
-    }
-
-    set updatedAt(value: Date) {
-        this._updatedAt = value;
-    }
-
-    get deletedAt(): Date {
-        return this._deletedAt;
-    }
-
-    set deletedAt(value: Date) {
-        this._deletedAt = value;
-    }
+  set code(value: string) {
+    this._code = value;
+  }
 }
